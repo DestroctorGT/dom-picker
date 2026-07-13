@@ -6,6 +6,12 @@
   "bin": {
     "dom-pick": "./bin/dom-pick"
   },
+  "files": [
+    "bin",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
   "dependencies": {
     "playwright": "^1.49.0"
   },

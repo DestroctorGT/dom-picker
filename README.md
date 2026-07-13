@@ -13,6 +13,23 @@ npm install
 npm link
 ```
 
+## Development
+
+```bash
+# Link local repo (changes reflect instantly)
+npm link
+
+# Test your changes
+dom-pick
+
+# When ready, publish
+npm publish
+
+# Revert to published version
+npm unlink -g dom-pick
+npm install -g dom-pick
+```
+
 ## Usage
 
 ```bash
