@@ -1,0 +1,14 @@
+{
+  "name": "dom-pick",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Lightweight DOM element picker — captures context for AI assistants",
+  "bin": {
+    "dom-pick": "./bin/dom-pick"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  },
+  "keywords": ["dom", "picker", "developer-tools", "ai", "clipboard"],
+  "license": "MIT"
+}
