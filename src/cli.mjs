@@ -1,6 +1,8 @@
 import { execSync } from 'node:child_process';
+import { createInterface } from 'node:readline';
 import { launchBrowser } from './browser.mjs';
 import { formatElement } from './formatter.mjs';
+import { detectPorts } from './detector.mjs';
 
 // ── Clipboard helpers ────────────────────────────────────────────────
 
@@ -49,12 +51,13 @@ function showHelp() {
   dom-pick — Lightweight DOM element picker for AI assistants
 
   USAGE
-    dom-pick <url>
-    dom-pick --url <url>
-    dom-pick -h | --help
+    dom-pick              Auto-detect dev server port
+    dom-pick <url>        Open specific URL
+    dom-pick -h | --help  Show this help
 
   EXAMPLES
-    dom-pick http://localhost:3000
+    dom-pick                          # detects localhost:3000, :5173, etc.
+    dom-pick http://localhost:3000    # explicit URL
     dom-pick https://example.com
 
   HOW TO USE
@@ -81,28 +84,63 @@ export async function run() {
     process.exit(0);
   }
 
-  if (!opts.url) {
-    console.error('Error: URL is required');
-    console.error('Usage: dom-pick <url>');
-    console.error('Run "dom-pick --help" for more info');
-    process.exit(1);
+  let url = opts.url;
+
+  // Auto-detect port if no URL provided
+  if (!url) {
+    console.log('\n  Scanning for dev servers...');
+    const ports = await detectPorts();
+
+    if (ports.length === 0) {
+      console.error('  No dev server found on common ports (3000, 5173, 8080, etc.)');
+      console.error('  Start your dev server or provide a URL: dom-pick <url>');
+      process.exit(1);
+    }
+
+    if (ports.length === 1) {
+      url = `http://localhost:${ports[0]}`;
+      console.log(`  Found: ${url}`);
+    } else {
+      // Multiple ports — let user choose
+      console.log(`\n  Found multiple dev servers:\n`);
+      ports.forEach((port, i) => {
+        console.log(`    ${i + 1}) localhost:${port}`);
+      });
+      console.log('');
+
+      const rl = createInterface({ input: process.stdin, output: process.stdout });
+      const answer = await new Promise((resolve) => {
+        rl.question('  Pick a port (number): ', (ans) => {
+          rl.close();
+          resolve(ans.trim());
+        });
+      });
+
+      const idx = parseInt(answer, 10) - 1;
+      if (isNaN(idx) || idx < 0 || idx >= ports.length) {
+        console.error(`  Invalid selection: "${answer}"`);
+        process.exit(1);
+      }
+      url = `http://localhost:${ports[idx]}`;
+      console.log(`  Using: ${url}`);
+    }
   }
 
   // Validate URL format
   try {
-    new URL(opts.url);
+    new URL(url);
   } catch {
-    console.error(`Error: Invalid URL "${opts.url}"`);
+    console.error(`Error: Invalid URL "${url}"`);
     console.error('Please provide a valid URL (e.g., http://localhost:3000)');
     process.exit(1);
   }
 
-  console.log(`\n  dom-pick — Opening ${opts.url}\n`);
+  console.log(`\n  dom-pick — Opening ${url}\n`);
 
   let selectionCount = 0;
 
   try {
-    const browser = await launchBrowser(opts.url, (data) => {
+    const browser = await launchBrowser(url, (data) => {
       selectionCount++;
       const formatted = formatElement(data);
       const copied = copyToClipboard(formatted);

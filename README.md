@@ -16,7 +16,8 @@ npm link
 ## Usage
 
 ```bash
-dom-pick http://localhost:3000
+dom-pick                          # auto-detects dev server
+dom-pick http://localhost:3000    # explicit URL
 ```
 
 1. Chromium opens with your URL
@@ -25,6 +26,10 @@ dom-pick http://localhost:3000
 4. **Click** to capture — element context is copied to your clipboard
 5. Paste (**Ctrl+V**) into Claude Code, Copilot, or any AI assistant
 6. Press **Escape** to exit picker mode, **Ctrl+Shift+C** to re-activate
+
+### Auto-detection
+
+`dom-pick` scans common dev server ports (3000, 5173, 8080, etc.) and connects to the first one found. No need to type the URL every time.
 
 ## What Gets Copied
 
@@ -59,10 +64,7 @@ padding: 2rem;
 ```lua
 -- ~/.config/nvim/lua/config/keymaps.lua
 vim.keymap.set('n', '<leader>bp', function()
-  local url = vim.fn.input('URL: ', 'http://localhost:3000')
-  if url ~= '' then
-    vim.fn.jobstart({ 'dom-pick', url }, { detached = true })
-  end
+  vim.fn.jobstart({ 'dom-pick' }, { detached = true })
 end, { desc = 'DOM Pick — open browser picker' })
 ```
 
