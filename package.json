@@ -10,5 +10,13 @@
     "playwright": "^1.49.0"
   },
   "keywords": ["dom", "picker", "developer-tools", "ai", "clipboard"],
-  "license": "MIT"
+  "license": "MIT",
+  "author": "DestroctorGT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DestroctorGT/dom-pick.git"
+  },
+  "engines": {
+    "node": ">=18"
+  }
 }
